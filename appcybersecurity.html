@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YPC Precision (Thailand) Co.,Ltd.</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
+
+    :root {
+      --primary-color: #2c3e50;
+      --secondary-color: #34495e;
+      --correct-color: #2ecc71;
+      --wrong-color: #e74c3c;
+      --text-light: #ecf0f1;
+      --text-dark: #34495e;
+      --font-family: 'Sarabun', sans-serif;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: #252a32;
+      background-image: url('factory2.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      color: var(--text-light);
+      text-align: center;
+      padding: 2vw;
+    }
+
+    .info-container {
+      position: fixed;
+      top: 1rem;
+      width: min(95%, 900px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: clamp(6px, 1.5vw, 12px) clamp(10px, 2vw, 20px);
+      z-index: 900;
+    }
+
+    .container {
+      width: min(90%, 750px);
+      padding: clamp(20px, 4vw, 40px);
+      background-color: rgba(52, 73, 94, 0.9);
+      backdrop-filter: blur(5px);
+      border-radius: 1rem;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      position: relative;
+      z-index: 10;
+      margin-top: clamp(60px, 10vh, 120px);
+    }
+
+    .logo {
+      width: clamp(100px, 20vw, 160px);
+      height: auto;
+      margin-bottom: 1.5rem;
+    }
+
+    h1, h2 {
+      font-weight: 700;
+      margin: 0.5rem 0;
+      font-size: clamp(1.2rem, 2.5vw, 2rem);
+    }
+
+    p {
+      font-size: clamp(1rem, 1.6vw, 1.2rem);
+    }
+
+    #start-screen, #result-screen {
+      padding: clamp(20px, 4vw, 40px);
+    }
+
+    #quiz-screen {
+      display: none;
+    }
+
+    #question-box {
+      background-color: var(--primary-color);
+      padding: clamp(20px, 3vw, 30px);
+      border-radius: 0.8rem;
+      margin-bottom: 1.5rem;
+      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(10px, 2vw, 15px);
+    }
+
+    .option-btn {
+      padding: clamp(15px, 3vw, 25px) clamp(12px, 2.5vw, 20px);
+      font-size: clamp(0.9rem, 1.4vw, 1.1rem);
+      font-weight: bold;
+      color: var(--text-dark);
+      background-color: #ecf0f1;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .option-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .correct {
+      background-color: var(--correct-color) !important;
+      color: white !important;
+    }
+
+    .wrong {
+      background-color: var(--wrong-color) !important;
+      color: white !important;
+    }
+
+    #score-display {
+      margin-top: 1.2rem;
+      font-size: clamp(1.2rem, 2vw, 1.5rem);
+      font-weight: bold;
+    }
+
+    #start-button, #restart-button {
+      padding: clamp(12px, 2.5vw, 18px) clamp(20px, 4vw, 30px);
+      font-size: clamp(1rem, 1.5vw, 1.2rem);
+      background-color: var(--correct-color);
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin-top: 1rem;
+    }
+
+    #start-button:hover, #restart-button:hover {
+      background-color: #27ae60;
+    }
+
+    .popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: clamp(20px, 4vw, 40px) clamp(30px, 6vw, 50px);
+      border-radius: 0.8rem;
+      font-size: clamp(1.2rem, 2vw, 2rem);
+      font-weight: bold;
+      text-align: center;
+      transition: transform 0.3s ease-in-out;
+      z-index: 1000;
+    }
+
+    .popup.show {
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .popup.correct {
+      background-color: rgba(46, 204, 113, 0.9);
+    }
+
+    .popup.wrong {
+      background-color: rgba(231, 76, 60, 0.9);
+    }
+
+    #timer-display, #score-display-bottom {
+      font-size: clamp(1.2rem, 3vw, 2rem);
+      font-weight: bold;
+      color: var(--text-light);
+      background-color: rgba(52, 73, 94, 0.8);
+      padding: clamp(8px, 2vw, 12px) clamp(12px, 3vw, 20px);
+      border-radius: 0.6rem;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="info-container">
+    <div id="score-display-bottom">คะแนน: 0</div>
+    <div id="timer-display">45</div>
+  </div>
+
+  <div class="container">
+    <div id="start-screen">
+      <img src="YPC.png" alt="YPC.png" class="logo">
+      <h1>หัวข้ออบรม : Cybersecurity</h1>
+      <p>ทดสอบความรู้ด้าน Cybersecurity และความปลอดภัยไซเบอร์ของคุณ</p>
+      <button id="start-button">เริ่มทำข้อสอบ</button>
+    </div>
+
+    <div id="quiz-screen" style="display: none;">
+      <div id="question-box">
+        <h2 id="question-text"></h2>
+      </div>
+      <div class="options-grid">
+        <button class="option-btn"></button>
+        <button class="option-btn"></button>
+        <button class="option-btn"></button>
+        <button class="option-btn"></button>
+      </div>
+    </div>
+
+    <div id="result-screen" style="display: none;">
+      <h1>แบบทดสอบเสร็จสมบูรณ์!</h1>
+      <h2 id="final-score"></h2>
+      <button id="restart-button">กลับหน้าแรก</button>
+    </div>
+  </div>
+
+  <div id="feedback-popup" class="popup"></div>
+
+  <script>
+    const startScreen = document.getElementById('start-screen');
+    const quizScreen = document.getElementById('quiz-screen');
+    const resultScreen = document.getElementById('result-screen');
+    const startButton = document.getElementById('start-button');
+    const restartButton = document.getElementById('restart-button');
+    const questionText = document.getElementById('question-text');
+    const optionButtons = document.querySelectorAll('.option-btn');
+    const finalScoreDisplay = document.getElementById('final-score');
+    const feedbackPopup = document.getElementById('feedback-popup');
+    const timerDisplay = document.getElementById('timer-display');
+    const scoreDisplayBottom = document.getElementById('score-display-bottom');
+
+    const appsScriptUrl = 'https://script.google.com/macros/s/AKfycbw_6T0uMNKW8Cw-bFUZNWu4NCVQKvMdwjAyhMLDyo5H9PEuH53w9WsfUYtC8lhHJmBA/exec';
+
+    const questions = [
+      {
+            question: "1.ภัยคุกคามประเภทใดที่ใช้วิธีการล็อกไฟล์สำคัญ เช่น เอกสาร รูปภาพ หรือวิดีโอ แล้วเรียกเงินค่าไถ่เพื่อแลกกับการปลดล็อกไฟล์?",
+            options: ["มัลแวร์ (Malware)", "สปายแวร์ (Spyware)", "แรนซัมแวร์ (Ransomware)", "ไวรัส (Virus)"],
+            answer: "แรนซัมแวร์ (Ransomware)"
+        },
+        {
+            question: "2.การโจมตีแบบ Man in the Middle Attack มีลักษณะอย่างไร",
+            options: ["การส่งข้อความหลอกลวงเพื่อให้เปิดลิงก์อันตราย", "การที่คนร้ายเข้ามาเป็นตัวกลางเพื่อดักฟังข้อมูลระหว่างสองฝ่าย", "การโจมตีระบบคอมพิวเตอร์หลายเครื่องพร้อมกันเพื่อทำให้เซิร์ฟเวอร์ล่ม", "การติดตั้งซอฟต์แวร์เพื่อสอดแนมการใช้งานคอมพิวเตอร์"],
+            answer: "การที่คนร้ายเข้ามาเป็นตัวกลางเพื่อดักฟังข้อมูลระหว่างสองฝ่าย"
+        },
+        {
+            question: "3.ข้อใดคือความแตกต่างหลักระหว่าง มัลแวร์ และ ไวรัส",
+            options: ["มัลแวร์ทำลายข้อมูลอย่างเดียว ส่วนไวรัสขโมยข้อมูล", "มัลแวร์เป็นซอฟต์แวร์อันตราย ส่วนไวรัสเป็นมัลแวร์ประเภทหนึ่งที่สามารถแพร่กระจายตัวเองได้", "ไวรัสแพร่กระจายทางอีเมลเท่านั้น แต่มัลแวร์แพร่กระจายผ่านทุกช่องทาง", "มัลแวร์มีไว้สอดแนม ส่วนไวรัสมีไว้เรียกค่าไถ่"],
+            answer: "มัลแวร์เป็นซอฟต์แวร์อันตราย ส่วนไวรัสเป็นมัลแวร์ประเภทหนึ่งที่สามารถแพร่กระจายตัวเองได้"
+        },
+        {
+            question: "4.การโจมตีประเภท DDoS Attack ส่งผลกระทบอย่างไร",
+            options: ["ทำให้ข้อมูลส่วนตัวถูกขโมยไป", "ทำให้คอมพิวเตอร์ไม่สามารถทำงานได้ตามปกติเพราะมีไวรัส", "ทำให้ระบบเซิร์ฟเวอร์เกิดความหนาแน่นจนไม่สามารถใช้งานได้", "ทำให้ผู้ใช้ต้องจ่ายเงินเพื่อกู้คืนไฟล์ที่ถูกล็อกไว้"],
+            answer: "ทำให้ระบบเซิร์ฟเวอร์เกิดความหนาแน่นจนไม่สามารถใช้งานได้"
+        },
+        {
+            question: "5.การขออนุญาตให้เข้าถึงข้อมูลจะช่วยป้องกันภัยคุกคามจากไวรัสได้ในลักษณะใด?",
+            options: ["การทำให้ข้อมูลไม่สามารถเข้าถึงได้โดยไม่ได้รับอนุญาต", "การปกป้องข้อมูลจากการสูญหาย", "การทำให้คอมพิวเตอร์ทำงานเร็วขึ้น", "การลดขนาดของไฟล์ข้อมูล"],
+            answer: "การทำให้ข้อมูลไม่สามารถเข้าถึงได้โดยไม่ได้รับอนุญาต"
+        },
+        {
+            question: "6.การกระทำใดถือเป็นตัวอย่างของการโจมตีแบบ 'ฟิชชิง' (Phishing)?",
+            options: ["แฮ็กเกอร์ส่งอีเมลปลอมที่ดูเหมือนมาจากธนาคารและขอให้คุณคลิกลิงก์เพื่ออัปเดตข้อมูลบัญชี", "แฮ็กเกอร์สร้างเว็บไซต์ปลอมเมื่อคุณเข้าชมและดาวน์โหลดไฟล์จากเว็บไซต์นั้น คอมพิวเตอร์ของคุณจะติดมัลแวร์ทันที", "แฮ็กเกอร์ส่งไฟล์แนบที่เป็นอันตรายมาในอีเมล และคุณเปิดไฟล์นั้นโดยไม่ตั้งใจ ทำให้คอมพิวเตอร์ติดไวรัส", "แฮ็กเกอร์ปล่อยมัลแวร์ลงในเครือข่ายสาธารณะเพื่อขโมยข้อมูลที่ถูกส่งไปมาระหว่างผู้ใช้งาน"],
+            answer: "แฮ็กเกอร์ส่งอีเมลปลอมที่ดูเหมือนมาจากธนาคารและขอให้คุณคลิกลิงก์เพื่ออัปเดตข้อมูลบัญชี"
+        },
+        {
+            question: "7.ในวิดีโอแนะนำว่าการมีความรู้ความเข้าใจเกี่ยวกับภัยคุกคามทางไซเบอร์จะช่วยอะไรได้บ้าง?",
+            options: ["ช่วยให้สามารถสร้าง Virus เพื่อใช้ป้องกันตนเองได้", "ช่วยให้สร้างรายได้เสริมจากโลกออนไลน์ได้ง่ายขึ้น", "ช่วยให้สามารถ Hack ระบบของผู้อื่นได้", "เป็นกลยุทธ์สำคัญในการต่อสู้กับอาชญากรรมทางไซเบอร์"],
+            answer: "เป็นกลยุทธ์สำคัญในการต่อสู้กับอาชญากรรมทางไซเบอร์"
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timer;
+    const timeLimit = 30;
+    let quizResults = [];
+
+    function startGame() {
+      startScreen.style.display = 'none';
+      quizScreen.style.display = 'block';
+      resultScreen.style.display = 'none';
+      timerDisplay.style.display = 'block';
+      scoreDisplayBottom.style.display = 'block';
+
+      currentQuestionIndex = 0;
+      score = 0;
+      quizResults = [];
+      scoreDisplayBottom.textContent = `คะแนน: ${score}`;
+      showQuestion();
+    }
+
+    function showQuestion() {
+      if (currentQuestionIndex >= questions.length) {
+        endGame();
+        return;
+      }
+      const currentQuestion = questions[currentQuestionIndex];
+      questionText.textContent = currentQuestion.question;
+
+      optionButtons.forEach(btn => {
+        btn.classList.remove('correct', 'wrong');
+        btn.disabled = false;
+      });
+
+      for (let i = 0; i < optionButtons.length; i++) {
+        optionButtons[i].textContent = currentQuestion.options[i];
+      }
+
+      startTimer();
+    }
+
+    function startTimer() {
+      let timeLeft = timeLimit;
+      timerDisplay.textContent = timeLeft;
+      clearInterval(timer);
+      timer = setInterval(() => {
+        timeLeft--;
+        timerDisplay.textContent = timeLeft;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          checkAnswer(null);
+        }
+      }, 1000);
+    }
+
+    function checkAnswer(selectedOption) {
+      clearInterval(timer);
+      const currentQuestion = questions[currentQuestionIndex];
+      const isCorrect = (selectedOption === currentQuestion.answer);
+
+      quizResults.push({
+        question: currentQuestion.question,
+        isCorrect: isCorrect,
+        userAnswer: selectedOption,
+        correctAnswer: currentQuestion.answer
+      });
+
+      optionButtons.forEach(btn => btn.disabled = true);
+
+      if (isCorrect) {
+        score += 1;
+        feedbackPopup.textContent = "ถูกต้อง! 👍";
+        feedbackPopup.classList.add('correct', 'show');
+      } else {
+        feedbackPopup.textContent = "ผิด! 👎";
+        feedbackPopup.classList.add('wrong', 'show');
+      }
+
+      scoreDisplayBottom.textContent = `คะแนน: ${score}`;
+
+      optionButtons.forEach(btn => {
+        if (btn.textContent === currentQuestion.answer) {
+          btn.classList.add('correct');
+        }
+      });
+
+      setTimeout(() => {
+        feedbackPopup.classList.remove('correct', 'wrong', 'show');
+        currentQuestionIndex++;
+        showQuestion();
+      }, 2000);
+    }
+
+    function endGame() {
+      quizScreen.style.display = 'none';
+      resultScreen.style.display = 'block';
+      timerDisplay.style.display = 'none';
+      scoreDisplayBottom.style.display = 'none';
+      finalScoreDisplay.textContent = `คะแนนของคุณ: ${score} จาก ${questions.length}`;
+
+      const employeeID = localStorage.getItem('currentEmployeeID');
+      const department = localStorage.getItem('currentDepartment');
+      const employeeName = localStorage.getItem('currentName');
+
+      if (!employeeID || !department || !employeeName) {
+        console.error("ไม่พบข้อมูลพนักงาน โปรดกลับไปที่หน้าแรกเพื่อกรอกข้อมูล");
+        return;
+      }
+
+      const correctAnswers = quizResults.filter(r => r.isCorrect).length;
+      const incorrectAnswers = quizResults.filter(r => !r.isCorrect).length;
+
+      const formData = {
+        employeeID: employeeID,
+        department: department,
+        name: employeeName,
+        topic: "Cybersecurity",
+        score: `${score} / ${questions.length}`,
+        results: `ตอบถูก ${correctAnswers} ข้อ, ตอบผิด ${incorrectAnswers} ข้อ`,
+        formType: "Quiz"
+      };
+
+      fetch(appsScriptUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      })
+      .then(() => console.log('Data sent successfully!'))
+      .catch(error => console.error('Error sending data:', error));
+    }
+
+    startButton.addEventListener('click', startGame);
+    restartButton.addEventListener('click', () => {
+	window.location.href = "register.html";
+	});
+    optionButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        const selectedOption = e.target.textContent;
+        checkAnswer(selectedOption);
+      });
+    });
+  </script>
+</body>
+</html>

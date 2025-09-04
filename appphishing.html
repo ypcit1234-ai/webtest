@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>YPC Precision (Thailand) Co.,Ltd.</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
+
+    :root {
+      --primary-color: #2c3e50;
+      --secondary-color: #34495e;
+      --correct-color: #2ecc71;
+      --wrong-color: #e74c3c;
+      --text-light: #ecf0f1;
+      --text-dark: #34495e;
+      --font-family: 'Sarabun', sans-serif;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: #252a32;
+      background-image: url('factory2.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      color: var(--text-light);
+      text-align: center;
+      position: relative;
+    }
+
+    .info-container {
+      position: fixed;
+      top: 20px;
+      width: 95%;
+      max-width: 800px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      z-index: 900;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 700px;
+      padding: 30px;
+      background-color: rgba(52, 73, 94, 0.9);
+      backdrop-filter: blur(5px);
+      border-radius: 15px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+      margin-top: 100px;
+      z-index: 10;
+    }
+
+    .logo {
+      width: 150px;
+      margin-bottom: 20px;
+    }
+
+    h1,h2 { font-weight: 700; }
+
+    #start-screen, #result-screen { padding: 40px; }
+    #quiz-screen { display: none; }
+
+    #question-box {
+      background-color: var(--primary-color);
+      padding: 30px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .option-btn {
+      padding: 25px 20px;
+      font-size: 1.1em;
+      font-weight: bold;
+      color: var(--text-dark);
+      background: #ecf0f1;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .option-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 8px rgba(0,0,0,0.2);
+    }
+
+    .correct { background-color: var(--correct-color) !important; color: #fff; }
+    .wrong   { background-color: var(--wrong-color) !important; color: #fff; }
+
+    #score-display-bottom,
+    #timer-display {
+      font-size: 2em;
+      font-weight: bold;
+      color: var(--text-light);
+      background-color: rgba(52, 73, 94, 0.8);
+      padding: 10px 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      display: none;
+    }
+
+    #start-button, #restart-button {
+      padding: 15px 30px;
+      font-size: 1.2em;
+      background: var(--correct-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transition: 0.3s;
+    }
+
+    #start-button:hover, #restart-button:hover { background: #27ae60; }
+
+    .popup {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%) scale(0);
+      padding: 30px 50px;
+      border-radius: 10px;
+      font-size: 2em;
+      font-weight: bold;
+      text-align: center;
+      transition: transform 0.3s ease-in-out;
+      z-index: 1000;
+      color: #fff;
+    }
+
+    .popup.show { transform: translate(-50%,-50%) scale(1); }
+    .popup.correct { background: rgba(46, 204, 113, 0.9); }
+    .popup.wrong   { background: rgba(231, 76, 60, 0.9); }
+  </style>
+</head>
+<body>
+  <div class="info-container">
+    <div id="score-display-bottom">คะแนน: 0</div>
+    <div id="timer-display">45</div>
+  </div>
+
+  <div class="container">
+    <!-- Start Screen -->
+    <div id="start-screen">
+      <img src="YPC.png" alt="YPC.png" class="logo">
+      <h1>หัวข้ออบรม : Phishing</h1>
+      <p>ทดสอบความรู้ด้าน Phishing และความปลอดภัยไซเบอร์ของคุณ</p>
+      <button id="start-button">เริ่มทำข้อสอบ</button>
+    </div>
+
+    <!-- Quiz Screen -->
+    <div id="quiz-screen">
+      <div id="question-box"><h2 id="question-text"></h2></div>
+      <div class="options-grid">
+        <button class="option-btn"></button>
+        <button class="option-btn"></button>
+        <button class="option-btn"></button>
+        <button class="option-btn"></button>
+      </div>
+    </div>
+
+    <!-- Result Screen -->
+    <div id="result-screen" style="display:none;">
+      <h1>แบบทดสอบเสร็จสมบูรณ์!</h1>
+      <h2 id="final-score"></h2>
+      <button id="restart-button">กลับหน้าแรก</button>
+    </div>
+  </div>
+
+  <!-- Popup -->
+  <div id="feedback-popup" class="popup"></div>
+
+  <script>
+    const startScreen = document.getElementById('start-screen');
+    const quizScreen = document.getElementById('quiz-screen');
+    const resultScreen = document.getElementById('result-screen');
+    const startButton = document.getElementById('start-button');
+    const restartButton = document.getElementById('restart-button');
+    const questionText = document.getElementById('question-text');
+    const optionButtons = document.querySelectorAll('.option-btn');
+    const finalScoreDisplay = document.getElementById('final-score');
+    const feedbackPopup = document.getElementById('feedback-popup');
+    const timerDisplay = document.getElementById('timer-display');
+    const scoreDisplayBottom = document.getElementById('score-display-bottom');
+
+    // URL Google Apps Script
+    const appsScriptUrl = 'https://script.google.com/macros/s/AKfycbw_6T0uMNKW8Cw-bFUZNWu4NCVQKvMdwjAyhMLDyo5H9PEuH53w9WsfUYtC8lhHJmBA/exec';
+
+    // คำถาม
+    const questions = [
+			{
+                question: "ข้อใดคือการหลอกลวงผ่านอีเมลเพื่อขโมยข้อมูลส่วนตัว?",
+                options: ["Phishing", "Hacking", "Malware", "Firewall"],
+                answer: "Phishing"
+            },
+            {
+                question: "หากได้รับลิงก์น่าสงสัย ควรทำอย่างไร?",
+                options: ["รีบคลิกดูทันที", "ส่งต่อให้เพื่อน", "ตรวจสอบแหล่งที่มาก่อนคลิก", "ไม่สนใจ"],
+                answer: "ตรวจสอบแหล่งที่มาก่อนคลิก"
+            },
+            {
+                question: "รหัสผ่านที่ปลอดภัยควรมีลักษณะอย่างไร?",
+                options: ["ชื่อ-นามสกุล", "วันเกิด", "มีตัวอักษรพิมพ์ใหญ่ พิมพ์เล็ก ตัวเลข และสัญลักษณ์", "คำง่ายๆ"],
+                answer: "มีตัวอักษรพิมพ์ใหญ่ พิมพ์เล็ก ตัวเลข และสัญลักษณ์"
+            },
+            {
+                question: "ซอฟต์แวร์ประสงค์ร้ายที่แพร่กระจายตัวเองได้คืออะไร?",
+                options: ["Worm", "Virus", "Trojan", "Spyware"],
+                answer: "Worm"
+            },
+            {
+                question: "Phishing แบบที่มีการเจาะจงเป้าหมายเฉพาะบุคคลหรือองค์กรเรียกว่าอะไร?",
+                options: ["Spear Phishing", "Smishing", "Vishing", "Whaling"],
+                answer: "Spear Phishing"
+            },
+            {
+                question: "การหลอกลวงผ่านข้อความ SMS เพื่อขโมยข้อมูลส่วนตัว เรียกว่าอะไร?",
+                options: ["Phishing", "Smishing", "Vishing", "Spam"],
+                answer: "Smishing"
+            },
+            {
+                question: "การหลอกลวงผ่านการโทรศัพท์เพื่อหลอกให้เหยื่อเปิดเผยข้อมูลสำคัญ เรียกว่าอะไร?",
+                options: ["Smishing", "Vishing", "Phishing", "Baiting"],
+                answer: "Vishing"
+            }
+        ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timer;
+    const timeLimit = 30;
+    let quizResults = [];
+
+    function startGame() {
+      startScreen.style.display = 'none';
+      quizScreen.style.display = 'block';
+      resultScreen.style.display = 'none';
+      timerDisplay.style.display = 'block';
+      scoreDisplayBottom.style.display = 'block';
+
+      currentQuestionIndex = 0;
+      score = 0;
+      quizResults = [];
+      scoreDisplayBottom.textContent = `คะแนน: ${score}`;
+      showQuestion();
+    }
+
+    function showQuestion() {
+      if (currentQuestionIndex >= questions.length) return endGame();
+      const q = questions[currentQuestionIndex];
+      questionText.textContent = q.question;
+
+      optionButtons.forEach((btn,i)=>{
+        btn.textContent = q.options[i];
+        btn.classList.remove('correct','wrong');
+        btn.disabled = false;
+      });
+
+      startTimer();
+    }
+
+    function startTimer() {
+      let timeLeft = timeLimit;
+      timerDisplay.textContent = timeLeft;
+      clearInterval(timer);
+      timer = setInterval(()=>{
+        timeLeft--;
+        timerDisplay.textContent = timeLeft;
+        if(timeLeft<=0){ clearInterval(timer); checkAnswer(null); }
+      },1000);
+    }
+
+    function checkAnswer(selected) {
+      clearInterval(timer);
+      const q = questions[currentQuestionIndex];
+      const correct = (selected===q.answer);
+
+      quizResults.push({
+        question: q.question,
+        isCorrect: correct,
+        userAnswer: selected,
+        correctAnswer: q.answer
+      });
+
+      optionButtons.forEach(btn=>btn.disabled=true);
+
+      if(correct){
+        score++;
+        feedbackPopup.textContent="ถูกต้อง! 👍";
+        feedbackPopup.classList.add('correct','show');
+      } else {
+        feedbackPopup.textContent="ผิด! 👎";
+        feedbackPopup.classList.add('wrong','show');
+      }
+
+      scoreDisplayBottom.textContent = `คะแนน: ${score}`;
+      optionButtons.forEach(btn=>{
+        if(btn.textContent===q.answer) btn.classList.add('correct');
+      });
+
+      setTimeout(()=>{
+        feedbackPopup.classList.remove('correct','wrong','show');
+        currentQuestionIndex++;
+        showQuestion();
+      },2000);
+    }
+
+    function endGame() {
+      quizScreen.style.display = 'none';
+      resultScreen.style.display = 'block';
+      timerDisplay.style.display = 'none';
+      scoreDisplayBottom.style.display = 'none';
+      finalScoreDisplay.textContent = `คะแนนของคุณ: ${score} จาก ${questions.length}`;
+
+      const employeeID = localStorage.getItem('currentEmployeeID');
+      const department = localStorage.getItem('currentDepartment');
+      const employeeName = localStorage.getItem('currentName');
+
+      if(!employeeID || !department || !employeeName){
+        console.error("ไม่พบข้อมูลพนักงาน โปรดกลับไปที่หน้าแรกเพื่อกรอกข้อมูล");
+        return;
+      }
+
+      const correctAnswers = quizResults.filter(r=>r.isCorrect).length;
+      const incorrectAnswers = quizResults.length - correctAnswers;
+
+      const formData = {
+        employeeID,
+        department,
+        name: employeeName,
+        topic: "Phishing",
+        score: `${score} / ${questions.length}`,
+        results: `ตอบถูก ${correctAnswers} ข้อ, ตอบผิด ${incorrectAnswers} ข้อ`,
+        formType: "Quiz"
+      };
+
+      fetch(appsScriptUrl,{
+        method:'POST',
+        mode:'no-cors',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(formData)
+      }).then(()=>{
+        console.log('Data sent successfully!');
+      }).catch(err=>{
+        console.error('Error sending data:',err);
+      });
+    }
+
+    startButton.addEventListener('click', startGame);
+    restartButton.addEventListener('click', () => {
+	window.location.href = "register.html";
+	});
+    optionButtons.forEach(btn=>btn.addEventListener('click',e=>checkAnswer(e.target.textContent)));
+  </script>
+</body>
+</html>

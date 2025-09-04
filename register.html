@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YPC Precision (Thailand) Co.,Ltd.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="YPC.png">
+
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            background-image: url('factory2.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #333;
+            padding: 2vw;
+        }
+
+        .container {
+            width: min(90%, 450px);
+            padding: clamp(20px, 4vw, 40px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 1rem;
+            text-align: center;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+            padding-bottom: 0.8rem;
+            border-bottom: 3px solid #e0e0e0;
+        }
+
+        .logo-image {
+            max-width: clamp(100px, 20vw, 150px);
+            height: auto;
+            display: inline-block;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .logo-image:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        h1 {
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: clamp(12px, 2vw, 20px);
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+            font-size: clamp(0.9rem, 1.2vw, 1rem);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: clamp(10px, 2vw, 14px);
+            border: 1px solid #ccc;
+            border-radius: 0.5rem;
+            box-sizing: border-box;
+            font-size: clamp(0.9rem, 1.2vw, 1rem);
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #0056b3;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: clamp(12px, 2.5vw, 15px);
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: clamp(1rem, 1.4vw, 1.1rem);
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+
+        button:hover {
+            background-color: #003d80;
+            transform: translateY(-2px);
+        }
+
+        /* ----- Overlay, Loader, Success Popup ----- */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .popup-box {
+            padding: clamp(20px, 4vw, 40px);
+            background: #fff;
+            border-radius: 1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: min(90%, 350px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .loader-spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #0056b3;
+            border-radius: 50%;
+            width: clamp(35px, 8vw, 50px);
+            height: clamp(35px, 8vw, 50px);
+            animation: spin 1s linear infinite;
+            margin-bottom: 1.2rem;
+        }
+
+        .loader-text {
+            font-size: clamp(1rem, 1.2vw, 1.2rem);
+            color: #333;
+            font-weight: 600;
+        }
+
+        .success-text {
+            font-size: clamp(1.1rem, 1.4vw, 1.4rem);
+            color: #28a745;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .success-icon {
+            color: #28a745;
+            font-size: clamp(40px, 6vw, 56px);
+            line-height: 1;
+            margin-bottom: 1rem;
+        }
+
+        .ok-button {
+            padding: clamp(10px, 2vw, 12px) clamp(20px, 4vw, 25px);
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: clamp(0.9rem, 1.2vw, 1rem);
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .ok-button:hover {
+            background-color: #003d80;
+        }
+
+        @keyframes spin {
+            0% {transform: rotate(0deg);}
+            100% {transform: rotate(360deg);}
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="logo-container">
+            <img src="YPC.png" alt="Company Logo" class="logo-image">
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="employeeID">Employee ID</label>
+                <input type="text" id="employeeID" name="employeeID" required placeholder="รหัสพนักงาน" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+            </div>
+
+            <div class="form-group">
+                <label for="department">Department</label>
+                <input type="text" id="department" name="department" required placeholder="แผนก">
+            </div>
+
+            <div class="form-group">
+                <label for="employeeName">Full Name</label>
+                <input type="text" id="employeeName" name="employeeName" required placeholder="ชื่อ-นามสกุล">
+            </div>
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <div id="loadingOverlay" class="overlay">
+        <div class="popup-box">
+            <div class="loader-spinner"></div>
+            <div class="loader-text">Saving data...</div>
+        </div>
+    </div>
+
+    <div id="successPopup" class="overlay">
+        <div class="popup-box">
+            <div class="success-icon">✓</div>
+            <div class="success-text">Data saved successfully.</div>
+            <button class="ok-button" onclick="window.location.href = 'training.html';">OK</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            // แปลงค่าเป็นข้อความก่อนบันทึก
+            const employeeID = document.getElementById('employeeID').value.toString();
+            const department = document.getElementById('department').value.toString();
+            const employeeName = document.getElementById('employeeName').value.toString();
+            
+            // ตรวจสอบว่ามีข้อมูลครบหรือไม่
+            if (employeeID === '' || department === '' || employeeName === '') {
+                alert('กรุณากรอกข้อมูลให้ครบทุกช่อง');
+                return;
+            }
+
+            // บันทึกข้อมูลลงใน localStorage
+            localStorage.setItem('currentEmployeeID', employeeID);
+            localStorage.setItem('currentDepartment', department);
+            localStorage.setItem('currentName', employeeName);
+
+            // แสดงหน้าจอสำเร็จทันที
+            document.getElementById('successPopup').style.display = 'flex';
+        });
+    </script>
+</body>
+</html>
